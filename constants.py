@@ -1,0 +1,1 @@
+AMOUNT_OF_COLORS = 5
