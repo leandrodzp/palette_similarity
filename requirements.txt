@@ -1,5 +1,6 @@
 colorgram.py==1.2.0
 environ==1.0
+elasticsearch==7.9.1
 fastapi==0.61.1
 Pillow==7.2.0
 pipenv==2018.11.26
