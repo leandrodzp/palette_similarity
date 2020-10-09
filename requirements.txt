@@ -1,6 +1,16 @@
+absl-py==0.10.0
+appdirs==1.4.4
+astunparse==1.6.3
+cachetools==4.1.1
+certifi==2020.6.20
+chardet==3.0.4
+click==7.1.2
 colorgram.py==1.2.0
-environ==1.0
+cycler==0.10.0
+decorator==4.4.2
+distlib==0.3.1
 elasticsearch==7.9.1
+environ==1.0
 fastapi==0.61.1
 filelock==3.0.12
 Flask==1.1.2
