@@ -25,7 +25,7 @@ from skimage import color
 import tensorflow as tf
 
 # Parameters of the embedding model.
-MODEL_DIR = "../model"
+MODEL_DIR = "palette_embedding/model"
 TAG = tf.saved_model.tag_constants.SERVING
 SIGNATURE_KEY = tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY
 IN_TENSOR_KEY = tf.saved_model.signature_constants.PREDICT_INPUTS
@@ -182,10 +182,6 @@ class PaletteEmbeddingModel(object):
 
 
 def main():
-    print("======================")
-    print("Palette embedding demo")
-    print("======================")
-
     # Load the embedding model
     model = PaletteEmbeddingModel()
 
