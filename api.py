@@ -12,10 +12,10 @@ from request_objects.recommendations_request import RecommendationsRequest
 app = FastAPI()
 
 @app.post("/generate_palette/")
-async def generate_palette(query_params: GeneratePaletteRequest):
+async def generate_palette(file: UploadFile = File(...)):
     response = {
         "number_of_colors" : AMOUNT_OF_COLORS,
-        "palette" : paletteFromImage(query_params.file)
+        "palette" : paletteFromImage(file)
     }
     return response
 
