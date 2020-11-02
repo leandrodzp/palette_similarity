@@ -29,3 +29,4 @@ class PaintingsSpider(scrapy.Spider):
         next_url = f'{URL}/paintings?page={next_page}'
         if next_page < 200:
           yield scrapy.Request(next_url, callback=self.parse)
+          
