@@ -20,8 +20,8 @@ class PaintingsSpider(scrapy.Spider):
                   'title': painting.css('p.kcNkMy a::text')[0].get(),
                   'artist': re.match(r"<a\b[^>]*>(.*?)<\/a>", painting.css('p.kcNkMy a')[1].get()).group(1).replace("<!-- -->", ""),
                   'price': painting.css('p.kcNkMy::text')[0].get().strip("$").replace(',', ''),
-                  'image-url': painting.css('div.jDvrtz a img::attr(src)')[0].get(),
-                  'purchase-url': f'{URL}/{product_path}',
+                  'image_url': painting.css('div.jDvrtz a img::attr(src)')[0].get(),
+                  'url': f'{URL}/{product_path}',
               }
             except IndexError:
               print('sorry')
