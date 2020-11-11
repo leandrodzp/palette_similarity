@@ -157,14 +157,6 @@ class PaletteEmbeddingModel(object):
         return self._sess.run(self._out_tensor, {self._in_tensor: in_tensors})
 
     def Embed(self, palette):
-        """Returns the embedding of a single color palette.
-
-        Args:
-            palette: A string representing a 5-color palette.
-
-        Returns:
-            A 15-D numpy array.
-        """
         return self.BatchEmbed([palette])[0]
 
     def ComputeDistance(self, a, b):

@@ -35,6 +35,7 @@ networkx==2.5
 numpy==1.18.5
 oauthlib==3.1.0
 opt-einsum==3.3.0
+pandas==1.1.4
 Pillow==7.2.0
 pipenv==2018.11.26
 protobuf==3.13.0
