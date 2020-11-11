@@ -9,10 +9,9 @@ from tqdm import tqdm
 scrapped_data = pd.read_csv(SCRAPPED_FILE, sep=",")
 
 # We first generate the palette for each image so we then can batch-generate the embeddings
-total = len(scrapped_data.index)
 palettes = []
 
-print(f"{scrapped_data.shape[0]} <- total images")
+print(f"{len(scrapped_data.index)} <- total images")
 for index, row in tqdm(scrapped_data.iterrows()):
     r = requests.get(row["image_url"])
     rgbs = palette_from_image(BytesIO(r.content))

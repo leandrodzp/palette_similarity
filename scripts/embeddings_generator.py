@@ -13,9 +13,7 @@ model = PaletteEmbeddingModel()
 embeddings = []
 k=1
 for palette in palettes:
-  embeddings.append(model.Embed(palette))
-  print(k)
-  k+=1
+  embeddings.append(model.Embed(palette).tolist())
 
 scrapped_data['embedding'] = embeddings
 scrapped_data.to_csv(SCRAPPED_FILE_WITH_EMBEDDINGS, index=False)

@@ -1,15 +1,16 @@
-from constants import ELASTIC_URL, INDEX_NAME, SCRAPPED_FILE
-from elasticsearch import helpers, Elasticsearch
+from constants import ELASTIC_URL, INDEX_NAME, SCRAPPED_FILE_WITH_EMBEDDINGS
+from elasticsearch import Elasticsearch
+
 import pandas as pd
+from ast import literal_eval
+from tqdm import tqdm
 
 elastic_client = Elasticsearch(hosts=ELASTIC_URL)
 
-scrapped_data = pd.read_csv(SCRAPPED_FILE, sep =',')
+scrapped_data = pd.read_csv(SCRAPPED_FILE_WITH_EMBEDDINGS, sep =',')
+scrapped_data['embedding'] = scrapped_data['embedding'].apply(literal_eval)
 
-count = 0
-total = len(scrapped_data.index)
-
-for index, row in scrapped_data.iterrows():
+for index, row in tqdm(scrapped_data.iterrows()):
     doc = {
             'title': row['title'],
             'price': row['price'],
@@ -18,5 +19,3 @@ for index, row in scrapped_data.iterrows():
             'palette_embedding' : row['embedding']
     }
     elastic_client.index(index=INDEX_NAME, body=doc)
-    count += 1
-    print('#{count} of #{total} documents were indexed.')
