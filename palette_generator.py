@@ -13,6 +13,6 @@ def palette_from_image(file):
     rgbs = []
     for color in colors_loop:
         rgbs.append("%02x%02x%02x" % color.rgb)
-        if len(rgbs) == 5:
+        if len(rgbs) == AMOUNT_OF_COLORS:
             break
     return rgbs

@@ -11,7 +11,7 @@ palettes = scrapped_data['palette'].tolist()
 model = PaletteEmbeddingModel()
 
 embeddings = []
-k=1
+
 for palette in palettes:
   embeddings.append(model.Embed(palette).tolist())
 
