@@ -3,7 +3,7 @@ from fastapi import FastAPI, File, UploadFile
 
 from constants import AMOUNT_OF_COLORS
 from palette_embedding.palette_embedding import PaletteEmbeddingModel
-from palette_generator import paletteFromImage
+from palette_generator import palette_from_image
 
 # Defines request objects to clean the API
 from request_objects.generate_palette_request import GeneratePaletteRequest
@@ -16,7 +16,7 @@ app = FastAPI()
 async def generate_palette(file: UploadFile = File(...)):
     response = {
         "number_of_colors": AMOUNT_OF_COLORS,
-        "palette": paletteFromImage(file.file),
+        "palette": palette_from_image(file.file),
     }
     return response
 

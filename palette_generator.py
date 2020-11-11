@@ -6,7 +6,7 @@ from PIL import Image
 from constants import AMOUNT_OF_COLORS
 
 
-def paletteFromImage(file):
+def palette_from_image(file):
     image = Image.open(file)
     colors = colorgram.extract(image, AMOUNT_OF_COLORS)
     colors_loop = cycle(colors)
