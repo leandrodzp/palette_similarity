@@ -27,6 +27,7 @@ OUT_TENSOR_KEY = tf.saved_model.signature_constants.PREDICT_OUTPUTS
 EMBEDDING_DIMENSION = 15
 NUM_ANNOY_TREES = 10
 
+
 def RgbFromHex(color_hex):
     """Returns a RGB color from a color hex.
 

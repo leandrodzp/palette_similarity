@@ -12,7 +12,9 @@ st.write("# Find the perfect art piece! :art:")
 # Data Input
 st.write("## Choose your image")
 link = st.text_input("Enter URL:")
-st.write("### <div align='center'>:point_up: or :point_down:</div>", unsafe_allow_html=True)
+st.write(
+    "### <div align='center'>:point_up: or :point_down:</div>", unsafe_allow_html=True
+)
 file = st.file_uploader("Upload image file:")
 
 # Process Input
