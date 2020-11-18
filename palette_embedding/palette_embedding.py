@@ -11,14 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Demo of the palette embedding model.
-
-Tested with Tensorflow version 1.3.0.
-
-Usage example:
-$ cd art-palette/palette-embedding/python
-$ python palette_embedding.py
-"""
 
 import numpy as np
 from skimage import color
@@ -34,11 +26,6 @@ OUT_TENSOR_KEY = tf.saved_model.signature_constants.PREDICT_OUTPUTS
 # Parameters of the palette search index.
 EMBEDDING_DIMENSION = 15
 NUM_ANNOY_TREES = 10
-
-# Some beautiful 5-color palettes. Each palette string contains 5 RGB colors
-# encoded as hexadecimal strings. View the palettes at
-# https://artsexperiments.withgoogle.com/artpalette/colors/<encoded_palette>
-# where <encoded_palette> is a palette string.
 
 def RgbFromHex(color_hex):
     """Returns a RGB color from a color hex.
@@ -121,25 +108,4 @@ class PaletteEmbeddingModel(object):
         return self._sess.run(self._out_tensor, {self._in_tensor: in_tensors})
 
     def Embed(self, palette):
-        """Returns the embedding of a single color palette.
-
-        Args:
-            palette: A string representing a 5-color palette.
-
-        Returns:
-            A 15-D numpy array.
-        """
         return self.BatchEmbed([palette])[0]
-
-    def ComputeDistance(self, a, b):
-        """Returns a perceptual distance between two palettes.
-
-        Args:
-            a: A palette (string).
-            b: Another palette (string).
-
-        Returns:
-            The distance between the palettes as a float.
-        """
-        embeddings = self.BatchEmbed([a, b])
-        return np.linalg.norm(embeddings[0] - embeddings[1])
