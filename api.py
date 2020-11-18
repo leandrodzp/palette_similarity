@@ -1,38 +1,48 @@
 import uvicorn
 from fastapi import FastAPI, File, UploadFile
+from elasticsearch import Elasticsearch
 
-from constants import AMOUNT_OF_COLORS
+from constants import ELASTIC_URL, INDEX_NAME
 from palette_embedding.palette_embedding import PaletteEmbeddingModel
 from palette_generator import palette_from_image
-
-# Defines request objects to clean the API
-from request_objects.generate_palette_request import GeneratePaletteRequest
-from request_objects.recommendations_request import RecommendationsRequest
 
 app = FastAPI()
 
 
-@app.post("/generate_palette/")
-async def generate_palette(file: UploadFile = File(...)):
-    response = {
-        "number_of_colors": AMOUNT_OF_COLORS,
-        "palette": palette_from_image(file.file),
-    }
-    return response
-
+elastic_client = Elasticsearch(hosts=ELASTIC_URL)
 
 @app.post("/recommendations/")
-async def generate_palette(query_params: RecommendationsRequest):
-    algorithm_entry = "-".join(query_params.palette)
+async def recommendations(file: UploadFile = File(...)):
+    palette = palette_from_image(file.file)
+    algorithm_entry = "-".join(palette)
     model = PaletteEmbeddingModel()
-    embedding = model.Embed(palette=algorithm_entry)
+    embedded_palette = list(model.Embed(algorithm_entry))
+    elastic_response = elastic_client.search(index=INDEX_NAME, body=query_object(embedded_palette))['hits']['hits']
 
-    # Here we should call the elastic searcher with query_params.filters
-    response = {
-        "recommendations": "This should be the response from Elastic",
+    final_response = []
+    for response in elastic_response:
+        final_response.append(response['_source'])
+
+    return final_response
+
+
+def query_object(query_vector):
+    {
+        "size" : 5,
+        "query": {
+            "script_score": {
+                "query" : {
+                    "match_all" : {}
+                },
+                "script": {
+                    "source": "1 / (1 + l2norm(params.queryVector, doc['palette_embedding']))",
+                    "params": {
+                        "queryVector": query_vector
+                    }
+                }
+            }
+        }
     }
-
-    return response
 
 
 if __name__ == "__main__":
