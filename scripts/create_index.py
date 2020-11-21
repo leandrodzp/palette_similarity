@@ -1,9 +1,9 @@
 from constants import (
     ELASTIC_URL,
-    INDEX_NAME,
     EMBEDDING_DIMS,
-    NUMBER_OF_SHARDS,
+    INDEX_NAME,
     NUMBER_OF_REPLICAS,
+    NUMBER_OF_SHARDS,
 )
 from elasticsearch import Elasticsearch
 

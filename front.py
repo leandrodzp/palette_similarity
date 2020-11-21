@@ -6,20 +6,34 @@ import requests
 import streamlit as st
 from PIL import Image, UnidentifiedImageError
 
-from constants import BACKEND_URL, URL_PATTERN
+from api import elastic_client, query_object
+from constants import INDEX_NAME, URL_PATTERN
+from palette_generator import embedding_from_palette, palette_from_image
 
 
-def get_recommendations(query_file):
-    r = requests.post(
-        BACKEND_URL + "/recommendations/",
-        files={"file": query_file},
-    )
-    query = r.json()
-    for result in query:
+@st.cache
+def get_images(response):
+    for result in response:
         img_r = requests.get(result["image_url"])
         img = Image.open(BytesIO(img_r.content))
         result["image"] = img
-    return query
+    return response
+
+
+def get_recommendations(file, gte, lte):
+    palette = palette_from_image(file)
+    algorithm_entry = "-".join(palette)
+
+    embedded_palette = embedding_from_palette(algorithm_entry)
+    elastic_response = elastic_client.search(
+        index=INDEX_NAME, body=query_object(embedded_palette, gte=gte, lte=lte)
+    )["hits"]["hits"]
+
+    final_response = []
+    for response in elastic_response:
+        final_response.append(response["_source"])
+    final_response = get_images(final_response)
+    return final_response
 
 
 st.write("# Find the perfect art piece! :art:")
@@ -53,6 +67,12 @@ if uploaded_file:
         st.warning("Unable to open image!")
         st.stop()
 
+# Filters
+st.sidebar.write("## Apply filters")
+gte, lte = st.sidebar.slider(
+    "Select a price range (U$S)", 0, 50000, (0, 50000), step=10
+)
+
 # Visualization options
 st.sidebar.write("## Visualization options")
 num_cols = st.sidebar.slider("columns", min_value=1, max_value=5, value=2, step=1)
@@ -67,8 +87,7 @@ if query_image:
     with st.beta_expander("See chosen image"):
         st.image(query_file, use_column_width=True)
 
-    query = get_recommendations(query_file)
-
+    query = get_recommendations(query_image, gte, lte)
     st.write("# Here is what we found! :tada:")
     for i in range(math.ceil(len(query) / num_cols)):
         cols = st.beta_columns(num_cols)
