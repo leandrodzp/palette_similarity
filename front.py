@@ -99,7 +99,6 @@ if query_image:
                 except:
                     st.write("Image not found :sad:")
                 st.write(f"#### U$S {result['price']}")
-                # if st.button("asd", key=result["url"]):
                 st.write(
                     f"<form action='{result['url']}'>"
                     "     <input type='submit' value='Buy it!' />"
