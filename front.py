@@ -20,20 +20,21 @@ def get_images(response):
     return response
 
 
-def get_recommendations(file, gte, lte):
+def get_recommendations(file, gte, lte, title):
     palette = palette_from_image(file)
     algorithm_entry = "-".join(palette)
 
     embedded_palette = embedding_from_palette(algorithm_entry)
-    elastic_response = elastic_client.search(
-        index=INDEX_NAME, body=query_object(embedded_palette, gte=gte, lte=lte)
-    )["hits"]["hits"]
+    body = query_object(embedded_palette, gte=gte, lte=lte, title=title)
+    elastic_response = elastic_client.search(index=INDEX_NAME, body=body,)[
+        "hits"
+    ]["hits"]
 
     final_response = []
     for response in elastic_response:
         final_response.append(response["_source"])
     final_response = get_images(final_response)
-    return final_response, palette
+    return final_response, body, palette
 
 def render_palette(palette):
     style = "height: 1.8rem; width: 1.8rem; border: 1px solid #808395; border-radius: .25rem; padding: 2px .8rem; margin_right: 10px; line-height: 1.6;"
@@ -77,8 +78,10 @@ if uploaded_file:
 
 # Filters
 st.sidebar.write("## Apply filters")
+title = st.sidebar.text_input("Art piece title")
+title = title if title else None
 gte, lte = st.sidebar.slider(
-    "Select a price range (U$S)", 0, 50000, (0, 50000), step=10
+    "Select a price range (U$S)", 0, 10000, (0, 10000), step=10
 )
 
 # Visualization options
@@ -95,8 +98,7 @@ if query_image:
     with st.beta_expander("See chosen image"):
         st.image(query_file, use_column_width=True)
 
-    query, palette = get_recommendations(query_image, gte, lte)
-
+    query, body, palette = get_recommendations(query_image, gte, lte, title)
     with st.beta_expander("This is your image palette", expanded=True):
         st.markdown(render_palette(palette), unsafe_allow_html=True)
 
@@ -120,3 +122,6 @@ if query_image:
                     " </form>",
                     unsafe_allow_html=True,
                 )
+
+    with st.beta_expander("See query and response"):
+        st.write(body, query)

@@ -30,7 +30,7 @@ async def recommendations(file: UploadFile = File(...)):
     return final_response
 
 
-def query_object(query_vector, gte=None, lte=None):
+def query_object(query_vector, gte=None, lte=None, title=None):
     query = {
         "size": 10,
         "query": {
@@ -51,9 +51,21 @@ def query_object(query_vector, gte=None, lte=None):
         range["price"]["lte"] = lte
         range["price"]["relation"] = "WITHIN"
     if range["price"]:
-        query["query"]["script_score"]["query"]["range"] = range
-        del query["query"]["script_score"]["query"]["match_all"]
+        range_query = {"bool": {"filter": {"range": range}}}
+        query["query"]["script_score"]["query"] = range_query
 
+    if title:
+        title_query = {"match": {"title": {"query": title}}}
+        if "bool" in query["query"]["script_score"]["query"]:
+            query["query"]["script_score"]["query"]["bool"]["filter"] = [
+                query["query"]["script_score"]["query"]["bool"]["filter"],
+                title_query,
+            ]
+        else:
+            title_query = {"bool": {"filter": title_query}}
+
+    if len(query["query"]["script_score"]["query"]) > 1:
+        del query["query"]["script_score"]["query"]["match_all"]
     return query
 
 
