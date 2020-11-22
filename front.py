@@ -20,20 +20,21 @@ def get_images(response):
     return response
 
 
-def get_recommendations(file, gte, lte):
+def get_recommendations(file, gte, lte, title):
     palette = palette_from_image(file)
     algorithm_entry = "-".join(palette)
 
     embedded_palette = embedding_from_palette(algorithm_entry)
-    elastic_response = elastic_client.search(
-        index=INDEX_NAME, body=query_object(embedded_palette, gte=gte, lte=lte)
-    )["hits"]["hits"]
+    body = query_object(embedded_palette, gte=gte, lte=lte, title=title)
+    elastic_response = elastic_client.search(index=INDEX_NAME, body=body,)[
+        "hits"
+    ]["hits"]
 
     final_response = []
     for response in elastic_response:
         final_response.append(response["_source"])
     final_response = get_images(final_response)
-    return final_response
+    return final_response, body
 
 
 st.write("# Find the perfect art piece! :art:")
@@ -69,8 +70,10 @@ if uploaded_file:
 
 # Filters
 st.sidebar.write("## Apply filters")
+title = st.sidebar.text_input("Art piece title")
+title = title if title else None
 gte, lte = st.sidebar.slider(
-    "Select a price range (U$S)", 0, 50000, (0, 50000), step=10
+    "Select a price range (U$S)", 0, 10000, (0, 10000), step=10
 )
 
 # Visualization options
@@ -87,7 +90,8 @@ if query_image:
     with st.beta_expander("See chosen image"):
         st.image(query_file, use_column_width=True)
 
-    query = get_recommendations(query_image, gte, lte)
+    query, body = get_recommendations(query_image, gte, lte, title)
+
     st.write("# Here is what we found! :tada:")
     for i in range(math.ceil(len(query) / num_cols)):
         cols = st.beta_columns(num_cols)
@@ -105,3 +109,6 @@ if query_image:
                     " </form>",
                     unsafe_allow_html=True,
                 )
+
+    with st.beta_expander("See query and response"):
+        st.write(body, query)
