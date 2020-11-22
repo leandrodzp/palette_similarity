@@ -33,7 +33,15 @@ def get_recommendations(file, gte, lte):
     for response in elastic_response:
         final_response.append(response["_source"])
     final_response = get_images(final_response)
-    return final_response
+    return final_response, palette
+
+def render_palette(palette):
+    style = "height: 1.8rem; width: 1.8rem; border: 1px solid #808395; border-radius: .25rem; padding: 2px .8rem; margin_right: 10px; line-height: 1.6;"
+    return f'<span style="background-color: #{palette[0]};{style}">\
+            </span><span style="background-color: #{palette[1]};{style}"></span>\
+            <span style="background-color: #{palette[2]};{style}"></span>\
+            <span style="background-color: #{palette[3]};{style}"></span>\
+            <span style="background-color: #{palette[4]};{style}"></span>'
 
 
 st.write("# Find the perfect art piece! :art:")
@@ -87,7 +95,11 @@ if query_image:
     with st.beta_expander("See chosen image"):
         st.image(query_file, use_column_width=True)
 
-    query = get_recommendations(query_image, gte, lte)
+    query, palette = get_recommendations(query_image, gte, lte)
+
+    with st.beta_expander("This is your image palette", expanded=True):
+        st.markdown(render_palette(palette), unsafe_allow_html=True)
+
     st.write("# Here is what we found! :tada:")
     for i in range(math.ceil(len(query) / num_cols)):
         cols = st.beta_columns(num_cols)
@@ -98,6 +110,9 @@ if query_image:
                     st.image(result["image"], use_column_width=True)
                 except:
                     st.write("Image not found :sad:")
+                st.markdown(render_palette(result['palette'].split("-")), unsafe_allow_html=True)
+                if 'artist' in result:
+                    st.write(f"#### Artist: {result['artist']}")
                 st.write(f"#### U$S {result['price']}")
                 st.write(
                     f"<form action='{result['url']}'>"
