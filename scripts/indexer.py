@@ -13,9 +13,11 @@ scrapped_data["embedding"] = scrapped_data["embedding"].apply(literal_eval)
 for index, row in tqdm(scrapped_data.iterrows()):
     doc = {
         "title": row["title"],
+        "artist": row["artist"],
         "price": row["price"],
         "image_url": row["image_url"],
         "url": row["url"],
+        "palette": row["palette"],
         "palette_embedding": row["embedding"],
     }
     elastic_client.index(index=INDEX_NAME, body=doc)
